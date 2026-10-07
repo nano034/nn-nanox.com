@@ -24,6 +24,17 @@
 
   let toastTimer = null;
 
+  // 既存 style.css の .reveal は main.js が表示状態へ切り替える前提。
+  // このサービスでは main.js に依存させないため、専用JS側で表示する。
+  document.querySelectorAll(".reveal").forEach((el) => {
+    requestAnimationFrame(() => el.classList.add("is-visible"));
+  });
+
+  // 既存サイトと同じく現在ページのナビをアクティブにする。
+  document.querySelectorAll(".bottom-nav .nav-item").forEach((item) => {
+    item.classList.toggle("is-active", item.dataset.page === "raw.html");
+  });
+
   function showToast(message) {
     if (!toast) return;
     toast.textContent = message;
@@ -148,4 +159,3 @@
 
   updateCount();
 })();
- 
