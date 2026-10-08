@@ -13,8 +13,7 @@
   // Cloudflare Worker
   // =========================================================
 
-  const API_URL =
-    "https://nn-raw-api.keisiri.f68.workers.dev/create";
+  const API_URL = "https://api.nn-nanox.com/create";
 
   // =========================================================
   // DOM
