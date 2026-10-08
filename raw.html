@@ -66,21 +66,13 @@
     <span class="tab-label yellow"><span class="dot">⚙️</span>OPTIONS</span>
     <div class="ticket-card">
       <div class="option-list">
-        <label class="option-row">
-          <span class="option-copy">
-            <strong>ブラウザ表示を隠す</strong>
-            <small>通常画面では内容を表示せず、Raw用途として扱います。</small>
-          </span>
-          <input id="hidePreview" type="checkbox" checked>
-          <span class="switch" aria-hidden="true"></span>
-        </label>
 
         <label class="option-row">
           <span class="option-copy">
-            <strong>コードを圧縮する</strong>
-            <small>簡易的な空白圧縮。コードによっては使用しないでください。</small>
+            <strong>そのまま使えるようにする</strong>
+            <small>loadstring(game:HttpGet(""))()で囲う</small>
           </span>
-          <input id="minifyCode" type="checkbox">
+          <input id="wrapLoadstring" type="checkbox">
           <span class="switch" aria-hidden="true"></span>
         </label>
 
@@ -92,6 +84,7 @@
           <input id="customNameToggle" type="checkbox">
           <span class="switch" aria-hidden="true"></span>
         </label>
+
       </div>
 
       <div id="filenameBox" class="filename-box is-hidden">
@@ -116,28 +109,25 @@
           <span class="status-dot"></span>
           <span>生成完了</span>
         </div>
+
         <p class="desc-box">生成したRawリンクです。コピーして利用できます。</p>
 
         <div class="url-box">
           <code id="rawUrl">https://example.com/raw/xxxxx.lua</code>
-          <button id="copyUrl" class="copy-btn" type="button">📋 コピー</button>
         </div>
 
         <div class="result-actions">
-          <a id="openRaw" class="btn btn--ghost btn--sm" href="#" target="_blank" rel="noopener">↗ Rawを開く</a>
+          <button id="copyUrl" class="copy-btn" type="button">📋 コピー</button>
+          <a id="openRaw"
+             class="btn btn--ghost btn--sm"
+             href="#"
+             target="_blank"
+             rel="noopener">
+            ↗ Rawを開く
+          </a>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <section class="section reveal">
-    <span class="tab-label pink"><span class="dot">💡</span>NOTE</span>
-    <div class="ticket-card">
-      <p class="desc-box">
-        <strong>このページは静的フロントエンドです。</strong><br>
-        実際に誰でも取得できるRawファイルを新規作成するには、保存先のAPIやサーバーが別途必要です。
-        このUIはそのバックエンドと接続できるように分離してあります。
-      </p>
+      </div>
     </div>
   </section>
 
@@ -145,16 +135,45 @@
 
   <nav class="bottom-nav" aria-label="ページナビゲーション">
     <a class="nav-item" href="index.html" data-page="index.html">
-      <span class="nav-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 9v10a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9"/></svg></span>HOME
+      <span class="nav-item__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9.5 12 3l9 6.5"/>
+          <path d="M5 9v10a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9"/>
+        </svg>
+      </span>
+      HOME
     </a>
+
     <a class="nav-item" href="st.html" data-page="st.html">
-      <span class="nav-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.5"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L12.5 19.5"/></svg></span>SITE
+      <span class="nav-item__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.5"/>
+          <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L12.5 19.5"/>
+        </svg>
+      </span>
+      SITE
     </a>
+
     <a class="nav-item" href="cm.html" data-page="cm.html">
-      <span class="nav-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="10" cy="7" r="3.2"/><path d="M22 20v-1a4 4 0 0 0-2.6-3.75"/><path d="M15.5 4.3A3.2 3.2 0 0 1 18 7.4a3.2 3.2 0 0 1-1.9 2.93"/></svg></span>COMMUNITY
+      <span class="nav-item__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/>
+          <circle cx="10" cy="7" r="3.2"/>
+          <path d="M22 20v-1a4 4 0 0 0-2.6-3.75"/>
+          <path d="M15.5 4.3A3.2 3.2 0 0 1 18 7.4a3.2 3.2 0 0 1-1.9 2.93"/>
+        </svg>
+      </span>
+      COMMUNITY
     </a>
+
     <a class="nav-item" href="sc.html" data-page="sc.html">
-      <span class="nav-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 6-5 6 5 6"/><path d="m16 6 5 6-5 6"/></svg></span>SCRIPT
+      <span class="nav-item__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m8 6-5 6 5 6"/>
+          <path d="m16 6 5 6-5 6"/>
+        </svg>
+      </span>
+      SCRIPT
     </a>
   </nav>
 </div>
