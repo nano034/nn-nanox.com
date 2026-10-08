@@ -950,7 +950,14 @@ a:focus-visible, button:focus-visible, select:focus-visible{
 .result-actions{
   display:flex;
   justify-content:center;
+  align-items:center;
+  gap:10px;
   margin-top:12px;
+  flex-wrap:wrap;
+}
+
+.result-actions .copy-btn{
+  margin-top:0;
 }
 
 @media (max-width:380px){
