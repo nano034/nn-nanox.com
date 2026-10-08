@@ -81,6 +81,7 @@ const SCRIPT_DATA = {
       { label: 'Invisible', code: 'loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Invisible-script-20557"))()' },
       { label: 'PR HUB (Byぷり)', code: 'loadstring(game:HttpGet("https://pastefy.app/71ug2hy1/raw"))()' },
       { label: 'Cryptic Hub', code: 'loadstring(game:HttpGet("https://raw.githubusercontent.com/OnlyCryptic/Cryptic/main/main.lua"))()' },
+      { label: 'Server hop', code: 'loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Server-Hop-230445"))()' },
     ],
   },
   2: {
