@@ -294,42 +294,6 @@ function showToast (message) {
 /* ---------------------------------------------------------
    DevTools検知ロック（F12対策）
    --------------------------------------------------------- */
-function initDevtoolsLock() {
-  const originalHTML = document.body.innerHTML; // 元のページを保存
-
-  setInterval(() => {
-    const threshold = 180;
-    const w = window.outerWidth - window.innerWidth;
-    const h = window.outerHeight - window.innerHeight;
-
-    const devtoolsOpen = w > threshold || h > threshold;
-
-    if (devtoolsOpen) {
-      // ロック画面
-      document.body.innerHTML = `
-        <div style="
-          height:100vh;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          flex-direction:column;
-          background:#000;
-          color:#fff;
-          font-family: 'Zen Maru Gothic', sans-serif;
-          text-align:center;
-        ">
-          <h1 style="font-size:32px; margin-bottom:10px;">DevTools detected</h1>
-          <p style="opacity:0.8;">このページでは開発者ツールは使用できません。</p>
-        </div>
-      `;
-    } else {
-      // DevToolsを閉じたら元のページに戻す
-      if (document.body.innerHTML.includes("DevTools detected")) {
-        document.body.innerHTML = originalHTML;
-      }
-    }
-  }, 500);
-}
 document.addEventListener('keydown', function (e) {
   // F12
   if (e.key === 'F12') {
