@@ -1,31 +1,15 @@
-/* =========================================================
-   NN | RAW GENERATOR
-   Cloudflare Worker API 接続版
-   main.js とは独立したサービス専用JS
-   ========================================================= */
-
 (() => {
-  "use strict";
-
   const $ = (id) => document.getElementById(id);
-
-  // =========================================================
-  // Cloudflare Worker
-  // =========================================================
-
-  const API_URL = "https://api.nn-nanox.com/create";
-
-  // =========================================================
-  // DOM
-  // =========================================================
 
   const input = $("rawInput");
   const count = $("charCount");
-  const hidePreview = $("hidePreview");
-  const minifyCode = $("minifyCode");
+
+  const wrapLoadstring = $("wrapLoadstring");
+
   const customNameToggle = $("customNameToggle");
   const filenameBox = $("filenameBox");
   const filename = $("filename");
+
   const createRaw = $("createRaw");
   const resultSection = $("resultSection");
   const rawUrl = $("rawUrl");
@@ -33,336 +17,177 @@
   const openRaw = $("openRaw");
   const toast = $("toast");
 
-  let toastTimer = null;
-  let creating = false;
-
-  // =========================================================
-  // 初期化
-  // =========================================================
-
-  document.querySelectorAll(".reveal").forEach((el) => {
-    requestAnimationFrame(() => {
-      el.classList.add("is-visible");
-    });
-  });
-
-  document.querySelectorAll(".bottom-nav .nav-item").forEach((item) => {
-    item.classList.toggle(
-      "is-active",
-      item.dataset.page === "raw.html"
-    );
-  });
-
-  // =========================================================
-  // Toast
-  // =========================================================
+  let generatedUrl = "";
 
   function showToast(message) {
     if (!toast) return;
 
     toast.textContent = message;
-    toast.classList.add("is-show");
+    toast.classList.add("show");
 
-    clearTimeout(toastTimer);
-
-    toastTimer = setTimeout(() => {
-      toast.classList.remove("is-show");
-    }, 2200);
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 1800);
   }
-
-  // =========================================================
-  // 文字数
-  // =========================================================
 
   function updateCount() {
-    if (!count || !input) return;
+    if (!input || !count) return;
 
-    count.textContent =
-      `${input.value.length.toLocaleString()} 文字`;
+    count.textContent = input.value.length.toLocaleString();
   }
 
-  // =========================================================
-  // 簡易Lua圧縮
-  // =========================================================
-
-  function simpleMinifyLua(text) {
-    return text
-      .split("\n")
-      .map((line) => line.trim())
-      .filter((line) => line !== "")
-      .join("\n");
-  }
-
-  // =========================================================
-  // ファイル名処理
-  // =========================================================
-
-  function sanitizeFilename(name) {
-    return String(name || "")
+  function sanitizeFilename(value) {
+    return value
       .trim()
-      .replace(/\.lua$/i, "")
-      .replace(/[^a-zA-Z0-9_-]/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 48);
+      .replace(/[\\/:*?"<>|]/g, "")
+      .replace(/\s+/g, "-")
+      .slice(0, 100);
   }
 
-  // =========================================================
-  // Raw生成
-  // =========================================================
+  function updateFilenameBox() {
+    if (!customNameToggle || !filenameBox) return;
 
-  async function create() {
-    if (creating) return;
+    filenameBox.hidden = !customNameToggle.checked;
+  }
 
-    let code = input.value;
-
-    // -----------------------------------------
-    // 空チェック
-    // -----------------------------------------
-
-    if (!code.trim()) {
-      showToast("コードを入力してください！");
-      input.focus();
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
       return;
     }
 
-    // -----------------------------------------
-    // 簡易圧縮
-    // -----------------------------------------
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
 
-    if (minifyCode.checked) {
-      code = simpleMinifyLua(code);
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    document.execCommand("copy");
+    textarea.remove();
+  }
+
+  async function create() {
+    if (!input || !createRaw) return;
+
+    const code = input.value;
+
+    if (!code.trim()) {
+      showToast("コードを入力してください");
+      return;
     }
 
-    // -----------------------------------------
-    // ファイル名
-    // -----------------------------------------
+    let customFilename = "";
 
-    const name = customNameToggle.checked
-      ? (sanitizeFilename(filename.value) || "script")
-      : "script";
+    if (customNameToggle?.checked) {
+      customFilename = sanitizeFilename(filename?.value || "");
 
-    // -----------------------------------------
-    // UIを生成中にする
-    // -----------------------------------------
-
-    creating = true;
-
-    const originalText = createRaw.textContent;
+      if (customFilename && !customFilename.endsWith(".lua")) {
+        customFilename += ".lua";
+      }
+    }
 
     createRaw.disabled = true;
-    createRaw.textContent = "生成中…";
-
-    showToast("Rawリンクを生成しています…");
+    createRaw.textContent = "生成中...";
 
     try {
-      // -----------------------------------------
-      // Cloudflare Workerへ送信
-      // -----------------------------------------
-
-      const response = await fetch(API_URL, {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-          code: code,
-          filename: name
-        })
-      });
-
-      // -----------------------------------------
-      // レスポンス解析
-      // -----------------------------------------
-
-      let data;
-
-      try {
-        data = await response.json();
-      } catch {
-        throw new Error(
-          "サーバーから正しいレスポンスが返りませんでした。"
-        );
-      }
-
-      // -----------------------------------------
-      // APIエラー
-      // -----------------------------------------
+      const response = await fetch(
+        "https://api.nn-nanox.com/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            code,
+            filename: customFilename
+          })
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(
-          data?.error ||
-          `サーバーエラー (${response.status})`
-        );
+        throw new Error(`HTTP ${response.status}`);
       }
 
-      // -----------------------------------------
-      // URL確認
-      // -----------------------------------------
+      const data = await response.json();
 
       if (!data.url) {
-        throw new Error(
-          "Raw URLを取得できませんでした。"
-        );
+        throw new Error("URLが取得できませんでした");
       }
 
-      // -----------------------------------------
-      // 結果表示
-      // -----------------------------------------
+      generatedUrl = data.url;
 
-      rawUrl.textContent = data.url;
-      openRaw.href = data.url;
+      if (rawUrl) {
+        rawUrl.textContent = generatedUrl;
+      }
 
-      resultSection.classList.remove("is-hidden");
-      resultSection.classList.add("is-visible");
+      // Rawを開く場合は必ず元URL
+      if (openRaw) {
+        openRaw.href = generatedUrl;
+      }
 
-      resultSection.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
+      if (resultSection) {
+        resultSection.hidden = false;
+      }
 
-      showToast("Rawリンクを生成しました！");
-
+      showToast("Rawを生成しました！");
     } catch (error) {
-
-      console.error(
-        "NN RAW GENERATOR ERROR:",
-        error
-      );
-
-      showToast(
-        error?.message ||
-        "生成に失敗しました。"
-      );
-
+      console.error(error);
+      showToast("生成に失敗しました");
     } finally {
-
-      creating = false;
-
       createRaw.disabled = false;
-      createRaw.textContent = originalText;
+      createRaw.textContent = "✨ Rawを生成";
     }
   }
 
-  // =========================================================
-  // 入力
-  // =========================================================
+  async function copyGeneratedUrl() {
+    const url = generatedUrl || rawUrl?.textContent.trim();
 
-  input.addEventListener(
-    "input",
-    updateCount
-  );
-
-  // =========================================================
-  // Enterで生成
-  // Shift + Enterは改行
-  // =========================================================
-
-  input.addEventListener(
-    "keydown",
-    (event) => {
-
-      if (
-        event.key === "Enter" &&
-        !event.shiftKey
-      ) {
-
-        event.preventDefault();
-
-        create();
-      }
-
+    if (!url || url.startsWith("https://example.com")) {
+      showToast("先にRawを生成してください");
+      return;
     }
-  );
 
-  // =========================================================
-  // カスタムファイル名
-  // =========================================================
+    const text = wrapLoadstring?.checked
+      ? `loadstring(game:HttpGet("${url}"))()`
+      : url;
 
-  customNameToggle.addEventListener(
-    "change",
-    () => {
-
-      filenameBox.classList.toggle(
-        "is-hidden",
-        !customNameToggle.checked
+    try {
+      await copyText(text);
+      showToast(
+        wrapLoadstring?.checked
+          ? "そのまま使える形でコピーしました！"
+          : "URLをコピーしました！"
       );
-
-      if (customNameToggle.checked) {
-        filename.focus();
-      }
-
+    } catch (error) {
+      console.error(error);
+      showToast("コピーに失敗しました");
     }
+  }
+
+  input?.addEventListener("input", updateCount);
+
+  customNameToggle?.addEventListener(
+    "change",
+    updateFilenameBox
   );
 
-  // =========================================================
-  // 生成ボタン
-  // =========================================================
-
-  createRaw.addEventListener(
+  createRaw?.addEventListener(
     "click",
     create
   );
 
-  // =========================================================
-  // URLコピー
-  // =========================================================
-
-  copyUrl.addEventListener(
+  copyUrl?.addEventListener(
     "click",
-    async () => {
-
-      const value = rawUrl.textContent.trim();
-
-      if (!value) {
-        showToast("コピーするURLがありません。");
-        return;
-      }
-
-      try {
-
-        await navigator.clipboard.writeText(value);
-
-        copyUrl.textContent =
-          "✓ コピーしました";
-
-        copyUrl.classList.add(
-          "is-copied"
-        );
-
-        showToast(
-          "URLをコピーしました！"
-        );
-
-        setTimeout(() => {
-
-          copyUrl.textContent =
-            "📋 コピー";
-
-          copyUrl.classList.remove(
-            "is-copied"
-          );
-
-        }, 1800);
-
-      } catch (error) {
-
-        console.error(error);
-
-        showToast(
-          "URLをコピーできませんでした"
-        );
-
-      }
-
-    }
+    copyGeneratedUrl
   );
 
-  // =========================================================
-  // 初期文字数
-  // =========================================================
-
   updateCount();
+  updateFilenameBox();
 
+  if (resultSection) {
+    resultSection.hidden = true;
+  }
 })();
