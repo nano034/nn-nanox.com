@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initReveal();
   initScriptPage();
   initCopyButtons();
-  initDevtoolsLock();   // ← これを追加
 });
 
 
