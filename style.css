@@ -977,6 +977,18 @@ a:focus-visible, button:focus-visible, select:focus-visible{
   }
   .raw-editor{ min-height:210px; }
 }
-
+.raw-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+.raw-head .raw-label{ margin-bottom:0; }
+.raw-head__actions{
+  display:flex;
+  gap:8px;
+  flex-shrink:0;
+}
 /* hidden属性が他の display 指定に負けないようにする保険 */
 [hidden]{ display:none !important; }
