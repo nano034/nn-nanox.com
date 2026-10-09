@@ -1,9 +1,11 @@
-
 (() => {
   const $ = (id) => document.getElementById(id);
 
   const input = $("rawInput");
   const count = $("charCount");
+
+  const pasteBtn = $("pasteBtn");
+  const clearBtn = $("clearBtn");
 
   const wrapLoadstring = $("wrapLoadstring");
 
@@ -34,17 +36,15 @@
   function updateCount() {
     if (!input || !count) return;
 
-    count.textContent = input.value.length.toLocaleString();
+    count.textContent = `${input.value.length.toLocaleString()} 文字`;
   }
 
-  // 変更後（URLで使える文字だけ残す）
-function sanitizeFilename(value) {
-  return value
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^A-Za-z0-9_-]/g, "")
-    .slice(0, 48);
-}
+  function sanitizeFilename(value) {
+    return value
+      .trim()
+      .replace(/[\\/:*?"<>|]/g, "")
+      .replace(/\s+/g, "-")
+      .slice(0, 100);
   }
 
   function updateFilenameBox() {
@@ -81,8 +81,47 @@ function sanitizeFilename(value) {
     textarea.remove();
   }
 
+  // クリップボードの中身をテキストボックスに貼り付ける
+  async function pasteFromClipboard() {
+    if (!input) return;
+
+    try {
+      const text = await navigator.clipboard.readText();
+
+      if (!text) {
+        showToast("クリップボードが空です");
+        return;
+      }
+
+      input.value = text;
+      updateCount();
+      showToast("貼り付けました！");
+    } catch (error) {
+      console.error(error);
+      showToast("貼り付けできませんでした");
+    }
+  }
+
+  // テキストボックスを空にする
+  function clearInput() {
+    if (!input) return;
+
+    if (!input.value) {
+      showToast("すでに空です");
+      return;
+    }
+
+    input.value = "";
+    updateCount();
+    input.focus();
+    showToast("クリアしました");
+  }
+
   async function create() {
     if (!input || !createRaw) return;
+
+    // 連打・二重送信を防ぐ
+    if (createRaw.disabled) return;
 
     const code = input.value;
 
@@ -96,7 +135,9 @@ function sanitizeFilename(value) {
     if (customNameToggle?.checked) {
       customFilename = sanitizeFilename(filename?.value || "");
 
-      
+      if (customFilename && !customFilename.endsWith(".lua")) {
+        customFilename += ".lua";
+      }
     }
 
     createRaw.disabled = true;
@@ -177,6 +218,17 @@ function sanitizeFilename(value) {
 
   input?.addEventListener("input", updateCount);
 
+  // Ctrl + Enter（MacはCmd + Enter）で生成
+  input?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      create();
+    }
+  });
+
+  pasteBtn?.addEventListener("click", pasteFromClipboard);
+  clearBtn?.addEventListener("click", clearInput);
+
   customNameToggle?.addEventListener(
     "change",
     updateFilenameBox
@@ -198,24 +250,3 @@ function sanitizeFilename(value) {
     resultSection.hidden = true;
   }
 })();
-const pasteBtn = $("pasteBtn");
-
-async function pasteFromClipboard() {
-  try {
-    const text = await navigator.clipboard.readText();
-
-    if (!text) {
-      showToast("クリップボードが空です");
-      return;
-    }
-
-    input.value = text;
-    updateCount();
-    showToast("貼り付けました！");
-  } catch (error) {
-    console.error(error);
-    showToast("貼り付けできませんでした");
-  }
-}
-
-pasteBtn?.addEventListener("click", pasteFromClipboard);
