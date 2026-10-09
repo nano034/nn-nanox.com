@@ -991,7 +991,7 @@ a:focus-visible, button:focus-visible, select:focus-visible{
   flex-shrink:0;
 }
 .link-btn__title {
-  line-height: 1.1;
+  line-height: 0;
 }
 /* hidden属性が他の display 指定に負けないようにする保険 */
 [hidden]{ display:none !important; }
