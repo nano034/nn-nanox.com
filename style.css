@@ -286,7 +286,6 @@ a:focus-visible, button:focus-visible, select:focus-visible{
   object-fit: contain;
   filter: drop-shadow(0 10px 18px rgba(70,60,160,.35));
 }
-}
 .hero__badge{
   display: inline-block;
   font-family: var(--f-display);
@@ -757,8 +756,10 @@ a:focus-visible, button:focus-visible, select:focus-visible{
     z-index: -1;
   }
 }
+
 /* =========================================================
-   NN | RAW GENERATOR — 既存 style.css に追加する専用CSS
+   NN | RAW GENERATOR 専用CSS
+   (旧 raw-generator.css の内容をここに統合)
    ========================================================= */
 
 .raw-label{
@@ -967,3 +968,6 @@ a:focus-visible, button:focus-visible, select:focus-visible{
   }
   .raw-editor{ min-height:210px; }
 }
+
+/* hidden属性が他の display 指定に負けないようにする保険 */
+[hidden]{ display:none !important; }
