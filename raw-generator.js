@@ -37,12 +37,14 @@
     count.textContent = input.value.length.toLocaleString();
   }
 
-  function sanitizeFilename(value) {
-    return value
-      .trim()
-      .replace(/[\\/:*?"<>|]/g, "")
-      .replace(/\s+/g, "-")
-      .slice(0, 100);
+  // 変更後（URLで使える文字だけ残す）
+function sanitizeFilename(value) {
+  return value
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^A-Za-z0-9_-]/g, "")
+    .slice(0, 48);
+}
   }
 
   function updateFilenameBox() {
@@ -94,9 +96,7 @@
     if (customNameToggle?.checked) {
       customFilename = sanitizeFilename(filename?.value || "");
 
-      if (customFilename && !customFilename.endsWith(".lua")) {
-        customFilename += ".lua";
-      }
+      
     }
 
     createRaw.disabled = true;
