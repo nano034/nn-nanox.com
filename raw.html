@@ -49,15 +49,21 @@
     <p>LuaやテキストをRaw形式で扱うためのジェネレーターです。<br>Enterでも生成できます。</p>
   </section>
 
-  <section class="section reveal">
+    <section class="section reveal">
     <span class="tab-label purple"><span class="dot">📝</span>INPUT</span>
     <div class="ticket-card">
-      <label class="raw-label" for="rawInput">コード / テキスト</label>
+      <div class="raw-head">
+        <label class="raw-label" for="rawInput">コード / テキスト</label>
+        <div class="raw-head__actions">
+          <button id="pasteBtn" class="btn btn--ghost btn--sm" type="button">📋 貼り付け</button>
+          <button id="clearBtn" class="btn btn--ghost btn--sm" type="button">🗑 クリア</button>
+        </div>
+      </div>
       <textarea id="rawInput" class="raw-editor" spellcheck="false"
         placeholder='print("Hello World")'></textarea>
       <div class="editor-meta">
         <span id="charCount">0 文字</span>
-        <span>Enterで生成 / Shift + Enterで改行</span>
+        <span>Ctrl + Enterで生成</span>
       </div>
     </div>
   </section>
