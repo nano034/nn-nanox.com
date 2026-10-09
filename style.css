@@ -961,6 +961,15 @@ a:focus-visible, button:focus-visible, select:focus-visible{
   margin-top:0;
 }
 
+.raw-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+.raw-head .raw-label{ margin-bottom:0; }
+
 @media (max-width:380px){
   .editor-meta{
     flex-direction:column;
