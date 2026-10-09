@@ -1,3 +1,4 @@
+```js
 (() => {
   const $ = (id) => document.getElementById(id);
 
@@ -48,6 +49,15 @@
     if (!customNameToggle || !filenameBox) return;
 
     filenameBox.hidden = !customNameToggle.checked;
+  }
+
+  // チェック状態に応じて表示するURLを切り替える
+  function updateDisplayedUrl() {
+    if (!rawUrl || !generatedUrl) return;
+
+    rawUrl.textContent = wrapLoadstring?.checked
+      ? `loadstring(game:HttpGet("${generatedUrl}"))()`
+      : generatedUrl;
   }
 
   async function copyText(text) {
@@ -119,11 +129,10 @@
 
       generatedUrl = data.url;
 
-      if (rawUrl) {
-        rawUrl.textContent = generatedUrl;
-      }
+      // 表示URLはチェック状態に応じて切り替える
+      updateDisplayedUrl();
 
-      // Rawを開く場合は必ず元URL
+      // Rawを開くボタンは常に元のURLを開く
       if (openRaw) {
         openRaw.href = generatedUrl;
       }
@@ -143,19 +152,18 @@
   }
 
   async function copyGeneratedUrl() {
-    const url = generatedUrl || rawUrl?.textContent.trim();
-
-    if (!url || url.startsWith("https://example.com")) {
+    if (!generatedUrl) {
       showToast("先にRawを生成してください");
       return;
     }
 
     const text = wrapLoadstring?.checked
-      ? `loadstring(game:HttpGet("${url}"))()`
-      : url;
+      ? `loadstring(game:HttpGet("${generatedUrl}"))()`
+      : generatedUrl;
 
     try {
       await copyText(text);
+
       showToast(
         wrapLoadstring?.checked
           ? "そのまま使える形でコピーしました！"
@@ -174,15 +182,14 @@
     updateFilenameBox
   );
 
-  createRaw?.addEventListener(
-    "click",
-    create
+  // チェックを切り替えたら表示URLも更新
+  wrapLoadstring?.addEventListener(
+    "change",
+    updateDisplayedUrl
   );
 
-  copyUrl?.addEventListener(
-    "click",
-    copyGeneratedUrl
-  );
+  createRaw?.addEventListener("click", create);
+  copyUrl?.addEventListener("click", copyGeneratedUrl);
 
   updateCount();
   updateFilenameBox();
@@ -191,3 +198,4 @@
     resultSection.hidden = true;
   }
 })();
+```
