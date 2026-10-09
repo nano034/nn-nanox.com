@@ -198,3 +198,24 @@ function sanitizeFilename(value) {
     resultSection.hidden = true;
   }
 })();
+const pasteBtn = $("pasteBtn");
+
+async function pasteFromClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+
+    if (!text) {
+      showToast("クリップボードが空です");
+      return;
+    }
+
+    input.value = text;
+    updateCount();
+    showToast("貼り付けました！");
+  } catch (error) {
+    console.error(error);
+    showToast("貼り付けできませんでした");
+  }
+}
+
+pasteBtn?.addEventListener("click", pasteFromClipboard);
