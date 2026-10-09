@@ -1,4 +1,4 @@
-(() => {
+ (() => {
   const $ = (id) => document.getElementById(id);
 
   const input = $("rawInput");
