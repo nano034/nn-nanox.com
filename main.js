@@ -100,7 +100,8 @@ const SCRIPT_DATA = {
    4: {
     label: 'Fling Things and People',
     cards: [
-      { label: 'Blitz ', code: 'loadstring(game:HttpGet("https://raw.githubusercontent.com/BlizTBr/scripts/refs/heads/main/FTAP.lua"))()' },
+      { label: 'かかまとのうんちせんとうはぶ', code: 'loadstring(game:HttpGet("https://kakam10.neocities.org/FTAP_KKM10.FREE_FTAP.txt"))()' }, 
+      { label: 'Blitz', code: 'loadstring(game:HttpGet("https://raw.githubusercontent.com/BlizTBr/scripts/refs/heads/main/FTAP.lua"))()' },
       { label: 'GGOG', code: 'loadstring(game:HttpGet("https://rawscripts.net/raw/Fling-Things-and-People-GGOG-Script-165953"))()' },
       { label: 'alan hub', code: 'loadstring(game:HttpGet("https://raw.githubusercontent.com/Artss1/Flades_Hub/refs/heads/main/We%20Are%20Arts.lua"))()' },
       { label: 'klal hub', code: 'loadstring(game:HttpGet("https://raw.githubusercontent.com/fratelevostru9999/src/refs/heads/main/VenomX%20Fling%20Things%20And%20People",true))()' },
